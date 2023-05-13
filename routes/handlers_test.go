@@ -21,7 +21,7 @@ import (
 
 type getLongestDurationMoviesResponse struct {
 	Results Results `json:"results"`
-	Status  string  `json:"status"`
+	Success bool    `json:"success"`
 }
 
 type Results struct {
@@ -71,7 +71,7 @@ func TestGetLongestDurationMovies(t *testing.T) {
 	if err != nil {
 		log.Fatal("Error while unmarshing", err)
 	}
-	assert.Equal(t, result_data.Status, "ok")
+	assert.Equal(t, result_data.Success, true)
 
 	rows, err := app.Db.Query(`
 		SELECT tconst

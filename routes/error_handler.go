@@ -21,6 +21,7 @@ func Handle(h Handler) gin.HandlerFunc {
 			if cerr == conf.ErrNotFound {
 				c.JSON(http.StatusNotFound, gin.H{
 					"message": "Not Found",
+					"success": false,
 				})
 				c.AbortWithStatus(404)
 				return
@@ -29,6 +30,7 @@ func Handle(h Handler) gin.HandlerFunc {
 			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": "internal server error",
+				"success": false,
 			})
 			c.Status(500)
 			return

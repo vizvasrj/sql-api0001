@@ -33,7 +33,7 @@ type PaginatedMovies struct {
 	CurrentPage     int           `json:"current_page"`
 	NextPage        int           `json:"next_page"`
 	PreviousPage    int           `json:"previous_page"`
-	Status          string        `json:"status"`
+	Success         bool          `json:"success"`
 	NextPageURL     string        `json:"next_page_url,omitempty"`
 	PreviousPageURL string        `json:"previous_page_url,omitempty"`
 }
@@ -45,7 +45,7 @@ type PaginatedGenre struct {
 	CurrentPage     int             `json:"current_page"`
 	NextPage        int             `json:"next_page"`
 	PreviousPage    int             `json:"previous_page"`
-	Status          string          `json:"status"`
+	Success         bool            `json:"success"`
 	NextPageURL     string          `json:"next_page_url,omitempty"`
 	PreviousPageURL string          `json:"previous_page_url,omitempty"`
 }

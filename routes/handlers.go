@@ -41,7 +41,7 @@ func (h MyHandler) getLongestDurationMovies(c *gin.Context) error {
 		return h.C.E(err)
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
+		"success": true,
 		"results": gin.H{
 			"movies": movies,
 		},
@@ -89,8 +89,8 @@ func (h MyHandler) createNewMovie(c *gin.Context) error {
 		return h.C.E(err)
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"status": "ok",
-		"movie":  movie,
+		"success": true,
+		"movie":   movie,
 	})
 	return nil
 }
@@ -101,12 +101,12 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || pageNum <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number", "success": false})
 		return nil
 	}
 	size, err := strconv.Atoi(pageSize)
 	if err != nil || size <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size", "success": false})
 		return nil
 	}
 
@@ -124,7 +124,7 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 	`, limit, offset)
 	if err != nil {
 		h.C.Error.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 
 		return nil
 	}
@@ -139,7 +139,7 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 	`).Scan(&totalCount)
 	if err != nil {
 		h.C.Error.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 
 		return nil
 	}
@@ -161,7 +161,7 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 		err := rows.Scan(&movie.Tconst, &movie.PrimaryTitle, &movie.Genres, &movie.AverageRating)
 		if err != nil {
 			h.C.Error.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 
 			return nil
 		}
@@ -170,7 +170,7 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 
 	if err = rows.Err(); err != nil {
 		h.C.Error.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 		return nil
 
 	}
@@ -182,15 +182,15 @@ func (h MyHandler) getTopRatedMovies(c *gin.Context) error {
 		CurrentPage:  pageNum,
 		NextPage:     nextPage,
 		PreviousPage: previousPage,
-		Status:       "ok",
+		Success:      true,
 	}
 	nextPageURL := ""
 	if nextPage != -1 {
-		nextPageURL = fmt.Sprintf("%s?page%d&page_size=%d", c.Request.URL.Path, nextPage, size)
+		nextPageURL = fmt.Sprintf("%s?page=%d&page_size=%d", c.Request.URL.Path, nextPage, size)
 	}
 	previousPageURL := ""
 	if previousPage != -1 {
-		previousPageURL = fmt.Sprintf("%s?page%d&page_size=%d", c.Request.URL.Path, previousPage, size)
+		previousPageURL = fmt.Sprintf("%s?page=%d&page_size=%d", c.Request.URL.Path, previousPage, size)
 	}
 	paginatedMovies.NextPageURL = nextPageURL
 	paginatedMovies.PreviousPageURL = previousPageURL
@@ -206,12 +206,12 @@ func (h MyHandler) getGenreMoviesWithSubtotals(c *gin.Context) error {
 
 	pageNum, err := strconv.Atoi(page)
 	if err != nil || pageNum <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page number", "success": false})
 		return nil
 	}
 	size, err := strconv.Atoi(pageSize)
 	if err != nil || size <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page size", "success": false})
 		return nil
 	}
 
@@ -256,7 +256,7 @@ func (h MyHandler) getGenreMoviesWithSubtotals(c *gin.Context) error {
 	`).Scan(&totalCount)
 	if err != nil {
 		h.C.Error.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 		return nil
 	}
 
@@ -292,15 +292,15 @@ func (h MyHandler) getGenreMoviesWithSubtotals(c *gin.Context) error {
 		CurrentPage:  pageNum,
 		NextPage:     nextPage,
 		PreviousPage: previousPage,
-		Status:       "ok",
+		Success:      true,
 	}
 	nextPageURL := ""
 	if nextPage != -1 {
-		nextPageURL = fmt.Sprintf("%s?page%d&page_size=%d", c.Request.URL.Path, nextPage, size)
+		nextPageURL = fmt.Sprintf("%s?page=%d&page_size=%d", c.Request.URL.Path, nextPage, size)
 	}
 	previousPageURL := ""
 	if previousPage != -1 {
-		previousPageURL = fmt.Sprintf("%s?page%d&page_size=%d", c.Request.URL.Path, previousPage, size)
+		previousPageURL = fmt.Sprintf("%s?page=%d&page_size=%d", c.Request.URL.Path, previousPage, size)
 	}
 	paginatedGenres.NextPageURL = nextPageURL
 	paginatedGenres.PreviousPageURL = previousPageURL
@@ -318,12 +318,12 @@ func (h MyHandler) updateRuntimeMinutes(c *gin.Context) error {
 	END;
 	`)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "success": false})
 		return nil
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Runtime minutes updated successfully",
-		"status":  "ok",
+		"success": true,
 	})
 	return nil
 }
