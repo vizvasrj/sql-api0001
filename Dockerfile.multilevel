@@ -1,0 +1,41 @@
+FROM golang:1.20.1-alpine3.17 as builder
+
+LABEL maintainer="Saurav raj <vizvasrj@gmail.com>"
+
+# RUN apk update && apk upgrade && \
+#     apk add --no-cache bash git openssh nmap postgresql-client
+
+# RUN go install github.com/golang-migrate/migrate/v4/source/pgx@latest
+
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+RUN go mod download
+
+COPY . .
+
+# Build go app
+RUN CGO_ENABLED=0 GOOS=linux go build -o myapp
+
+FROM alpine:3.17
+
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh nmap postgresql-client
+
+
+WORKDIR /app
+
+COPY --from=builder /app/myapp .
+COPY --from=builder /app/wait.sh .
+COPY --from=builder /app/movies.csv .
+COPY --from=builder /app/ratings.csv .
+COPY --from=builder /go/bin/migrate /usr/local/bin/migrate
+COPY --from=builder /app/migrations/ ./migrations
+# RUN mkdir -p locks
+# RUN ls /app
+# EXPOSE 8080

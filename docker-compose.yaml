@@ -1,0 +1,44 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_go
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sql_rest_test0001
+    networks:
+      - my-network
+    volumes:
+      - postgres_test_go:/var/lib/postgresql/data
+
+
+  movies:
+    container_name: movies_go
+    build:
+      context: .
+      dockerfile: Dockerfile.multilevel
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sql_rest_test0001
+      - POSTGRES_HOST=postgres_go
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres_go/${POSTGRES_DB}?sslmode=disable
+    command: "bash wait.sh"
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+    restart: unless-stopped
+
+
+networks:
+  my-network:
+  
+volumes:
+  postgres_test_go:
+    external: true

@@ -1,0 +1,6 @@
+.env
+.movies_seed.lock
+.ratings_seed.lock
+
+locks/.movies_seed.lock
+locks/.ratings_seed.lock
